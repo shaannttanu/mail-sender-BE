@@ -41,7 +41,11 @@ public class CommonController {
             return ResponseEntity.ok(new RestResponse<>("Success",true,null,null,null));
         } catch (Exception e) {
             return ResponseEntity.status(500)
-                    .body(new RestResponse<>("Error processing Excel file ",false, e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR.value(),null));
+                .body(new RestResponse<>("Error processing Excel file ",
+                    false,
+                    e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null));
         }
     }
 
