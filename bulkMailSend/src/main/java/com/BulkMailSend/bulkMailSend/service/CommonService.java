@@ -16,36 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class CommonService {
 
-    @Autowired
-    private OrganisationRepository organisationRepository;
+public interface CommonService {
 
-    public void parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException {
-        Map<String, String> organisationEmails = new HashMap<>();
-
-        try (InputStream is = file.getInputStream();
-             Workbook workbook = WorkbookFactory.create(is)) {
-
-            Sheet sheet = workbook.getSheetAt(0); // Get the first sheet
-
-            boolean isFirstRow = true;
-            for (Row row : sheet) {
-                if (isFirstRow) {
-                    isFirstRow = false;
-                    continue;
-                }
-
-                //change index of organisationId column in getCell() method
-                String organisationId = row.getCell(0).getStringCellValue();
-
-                Organisation organisation = organisationRepository.findByOrganisationId(organisationId);
-                if (organisation != null) {
-                    organisationEmails.put(organisationId, organisation.getEmail());
-                }
-            }
-        }
-
-    }
+    void submitCampaign(String campaignName);
+    public void parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException;
 
 }
