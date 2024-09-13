@@ -41,6 +41,7 @@ public class CommonServiceImpl implements CommonService {
             commonRepository.save(campaign);
         }catch (Exception e){
             logger.error(e.getMessage());
+            throw new RuntimeException("Could not create campaign , "+e.getMessage(),e);
         }
     }
 
