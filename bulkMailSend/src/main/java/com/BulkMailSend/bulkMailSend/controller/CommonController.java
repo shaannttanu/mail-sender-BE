@@ -51,7 +51,7 @@ public class CommonController {
             logger.error("Failed for {}",e.getMessage());
             return ResponseEntity.status(500)
                 .body(new RestResponse<>("Error processing Excel file ",
-                    false,
+                        false,
                     e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     null));
