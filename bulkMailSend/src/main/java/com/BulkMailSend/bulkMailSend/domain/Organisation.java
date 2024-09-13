@@ -1,11 +1,13 @@
 package com.BulkMailSend.bulkMailSend.domain;
 
+import com.BulkMailSend.bulkMailSend.converter.EmailAttributeConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -26,8 +28,9 @@ public class Organisation {
     @Column(name = "organisationName" , nullable = false)
     private String organisationName ;
 
+    @Convert(converter = EmailAttributeConverter.class)
     @Column(name = "email", columnDefinition = "TEXT")
-    private String email;
+    private List<String> email;
 
     @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(

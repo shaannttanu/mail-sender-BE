@@ -8,11 +8,14 @@ import com.BulkMailSend.bulkMailSend.service.CommonService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,23 +29,30 @@ public class CommonServiceImpl implements CommonService {
     @Autowired
     OrganisationRepository organisationRepository;
 
+    Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
+
     @Override
     public void submitCampaign(String campaignName) {
         Campaign campaign= new Campaign();
         campaign.setCampaignId("test1");
         campaign.setCampaignName(campaignName);
-        commonRepository.save(campaign);
+
+        try {
+            commonRepository.save(campaign);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
     }
 
 
     @Override
-    public void parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException {
-        Map<String, String> organisationEmails = new HashMap<>();
+    public Map<String, List<String>> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException {
+        Map<String, List<String>> organisationEmails = new HashMap<>();
 
         try (InputStream is = file.getInputStream();
              Workbook workbook = WorkbookFactory.create(is)) {
 
-            Sheet sheet = workbook.getSheetAt(0); // Get the first sheet
+            Sheet sheet = workbook.getSheetAt(0);
 
             boolean isFirstRow = true;
             for (Row row : sheet) {
@@ -51,16 +61,18 @@ public class CommonServiceImpl implements CommonService {
                     continue;
                 }
 
-                //change index of organisationId column in getCell() method
+                // Change index of organisationId column in getCell() method
                 String organisationId = row.getCell(0).getStringCellValue();
+                logger.info("Parsing for row: {}", row.getRowNum());
 
                 Organisation organisation = organisationRepository.findByOrganisationId(organisationId);
                 if (organisation != null) {
-                    organisationEmails.put(organisationId, organisation.getEmail());
+                    organisationEmails.put(organisation.getOrganisationId(), organisation.getEmail());
                 }
             }
         }
 
+        return organisationEmails;
     }
 
 }

@@ -4,6 +4,8 @@ import com.BulkMailSend.bulkMailSend.service.CommonService;
 import com.BulkMailSend.bulkMailSend.util.RestResponse;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RequestMapping("/api/v1/emailer")
@@ -33,13 +38,17 @@ public class CommonController {
     public static void submitCsv() {
     }
 
+    Logger logger = LoggerFactory.getLogger(CommonController.class);
 
     @PostMapping("/uploadExcel")
-    public ResponseEntity<RestResponse<String>> submitExcel(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<RestResponse<?>> submitExcel(@RequestParam("file") MultipartFile file) {
         try {
-            commonService.parseExcelAndFetchOrganisationEmails(file);
-            return ResponseEntity.ok(new RestResponse<>("Success",true,null,null,null));
+            Map<String,List<String>> organisationEmails = commonService.parseExcelAndFetchOrganisationEmails(file);
+            return ResponseEntity.ok(new RestResponse<>(organisationEmails
+                    ,true,null
+                    ,null,null));
         } catch (Exception e) {
+            logger.error("Failed for {}",e.getMessage());
             return ResponseEntity.status(500)
                 .body(new RestResponse<>("Error processing Excel file ",
                     false,

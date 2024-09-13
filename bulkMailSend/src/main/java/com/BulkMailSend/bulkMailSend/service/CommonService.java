@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -20,6 +21,6 @@ import java.util.Map;
 public interface CommonService {
 
     void submitCampaign(String campaignName);
-    public void parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException;
+    Map<String, List<String>> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException;
 
 }
