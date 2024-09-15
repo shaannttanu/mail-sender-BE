@@ -2,6 +2,7 @@ package com.BulkMailSend.bulkMailSend.service.CommonServiceImpl;
 
 import com.BulkMailSend.bulkMailSend.domain.Campaign;
 import com.BulkMailSend.bulkMailSend.domain.Organisation;
+import com.BulkMailSend.bulkMailSend.dto.MailDto;
 import com.BulkMailSend.bulkMailSend.repository.CampaignRepository;
 import com.BulkMailSend.bulkMailSend.repository.OrganisationRepository;
 import com.BulkMailSend.bulkMailSend.service.CommonService;
@@ -11,6 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import java.util.stream.Collectors;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -19,6 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import javax.mail.internet.*;
+import java.util.List;
+import java.util.Properties;
 
 @Service
 public class CommonServiceImpl implements CommonService {
@@ -50,8 +59,8 @@ public class CommonServiceImpl implements CommonService {
 
 
     @Override
-    public Map<String, List<String>> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException {
-        Map<String, List<String>> organisationEmails = new HashMap<>();
+    public List<String> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException {
+         List<List<String>>organisationEmails = new ArrayList<>();
 
         final String REQUIRED_COLUMN_NAME = "organisationId";
 
@@ -95,13 +104,15 @@ public class CommonServiceImpl implements CommonService {
 
                 Organisation organisation = organisationRepository.findByOrganisationId(organisationId);
                 if (organisation != null) {
-                    organisationEmails.computeIfAbsent(organisation.getOrganisationId(), k -> new ArrayList<>())
-                            .add(String.valueOf(organisation.getEmail()));
+                    List<String> emailList=organisation.getEmail();
+                   organisationEmails.add(emailList);
                 }
             }
         }
 
-        return organisationEmails;
+        return organisationEmails.stream()
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
     }
 
 
@@ -120,4 +131,10 @@ public class CommonServiceImpl implements CommonService {
         }
     }
 
+
+    @Override
+    public void sendMail(MailDto mailDto) {
+        System.out.println("mail sent");
+        return;
+    }
 }

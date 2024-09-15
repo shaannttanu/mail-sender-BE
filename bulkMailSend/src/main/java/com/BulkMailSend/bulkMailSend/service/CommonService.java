@@ -2,6 +2,7 @@ package com.BulkMailSend.bulkMailSend.service;
 
 import com.BulkMailSend.bulkMailSend.domain.Campaign;
 import com.BulkMailSend.bulkMailSend.domain.Organisation;
+import com.BulkMailSend.bulkMailSend.dto.MailDto;
 import com.BulkMailSend.bulkMailSend.repository.OrganisationRepository;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -23,7 +24,8 @@ import java.util.Map;
 public interface CommonService {
 
     Campaign submitCampaign(Campaign campaignName);
-    Map<String, List<String>> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException;
+    List<String> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException;
     ByteArrayResource generateTemplate() throws IOException;
 
+    void sendMail(MailDto mailDto);
 }

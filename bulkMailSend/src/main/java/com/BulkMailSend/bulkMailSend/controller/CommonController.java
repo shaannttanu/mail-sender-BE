@@ -1,6 +1,7 @@
 package com.BulkMailSend.bulkMailSend.controller;
 
 import com.BulkMailSend.bulkMailSend.domain.Campaign;
+import com.BulkMailSend.bulkMailSend.dto.MailDto;
 import com.BulkMailSend.bulkMailSend.service.CommonService;
 import com.BulkMailSend.bulkMailSend.util.RestResponse;
 import jakarta.servlet.http.HttpServlet;
@@ -80,7 +81,8 @@ public class CommonController {
     @PostMapping("/uploadExcel")
     public ResponseEntity<RestResponse<?>> submitExcel(@RequestParam("file") MultipartFile file) {
         try {
-            Map<String,List<String>> organisationEmails = commonService.parseExcelAndFetchOrganisationEmails(file);
+            List<String> organisationEmails = commonService.parseExcelAndFetchOrganisationEmails(file);
+            System.out.println(organisationEmails);
             return ResponseEntity.ok(new RestResponse<>(organisationEmails
                     ,true,null
                     ,null,null));
@@ -96,7 +98,23 @@ public class CommonController {
     }
 
     @PostMapping("/sendEmail")
-    public static void sendmail(){
+    public  ResponseEntity<RestResponse<?>> sendmail(@RequestBody MailDto mailDto){
+       try{
+           commonService.sendMail(mailDto);
+
+        return ResponseEntity.ok(new RestResponse<>(mailDto
+            ,true,null
+            ,null,null));
+       }
+       catch (Exception e){
+           logger.error("Failed for {}",e.getMessage());
+           return ResponseEntity.status(500)
+               .body(new RestResponse<>("Error sending mails ",
+                   false,
+                   e.getMessage(),
+                   HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                   null));
+       }
 
     }
 
