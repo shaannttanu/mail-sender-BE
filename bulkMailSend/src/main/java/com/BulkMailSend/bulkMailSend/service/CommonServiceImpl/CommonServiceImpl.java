@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -24,24 +26,27 @@ import org.springframework.web.multipart.MultipartFile;
 public class CommonServiceImpl implements CommonService {
 
     @Autowired
-    CampaignRepository commonRepository;
+    CampaignRepository campaignRepository;
 
     @Autowired
     OrganisationRepository organisationRepository;
 
     Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
 
+
     @Override
-    public void submitCampaign(String campaignName) {
-        Campaign campaign= new Campaign();
-        campaign.setCampaignId("test1");
-        campaign.setCampaignName(campaignName);
+    public Campaign submitCampaign(Campaign campaign) {
+        // Create a new Campaign object
+        Campaign newCampaign = new Campaign();
+        newCampaign.setCampaignId(UUID.randomUUID().toString());
+        newCampaign.setCampaignName(campaign.getCampaignName());
 
         try {
-            commonRepository.save(campaign);
-        }catch (Exception e){
-            logger.error(e.getMessage());
-            throw new RuntimeException("Could not create campaign , "+e.getMessage(),e);
+            // Save the campaign and return the saved object
+            return campaignRepository.save(newCampaign);
+        } catch (Exception e) {
+            logger.error("Error creating campaign: {}", e.getMessage());
+            throw new RuntimeException("Could not create campaign: " + e.getMessage(), e);
         }
     }
 

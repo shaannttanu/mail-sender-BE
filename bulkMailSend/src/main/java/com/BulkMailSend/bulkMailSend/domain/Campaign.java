@@ -20,7 +20,7 @@ public class Campaign {
     @Column(name = "id", nullable = false)
     private long id;
 
-    @Column(name = "campaignId", nullable = false, unique = true)
+    @Column(name = "campaignId" , unique = true)
     private String campaignId;
 
     @Column(name = "campaignName", nullable = false)

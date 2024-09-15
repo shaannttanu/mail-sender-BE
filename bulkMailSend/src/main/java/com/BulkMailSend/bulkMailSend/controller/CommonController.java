@@ -1,5 +1,6 @@
 package com.BulkMailSend.bulkMailSend.controller;
 
+import com.BulkMailSend.bulkMailSend.domain.Campaign;
 import com.BulkMailSend.bulkMailSend.service.CommonService;
 import com.BulkMailSend.bulkMailSend.util.RestResponse;
 import jakarta.servlet.http.HttpServlet;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +32,27 @@ public class CommonController {
     CommonService commonService;
 
     @PostMapping("/createCampaign")
-    public  void submitCampaign(@RequestParam String campaignName){
-        commonService.submitCampaign(campaignName);
+    public ResponseEntity<RestResponse<?>> submitCampaign(@RequestBody Campaign campaign,
+                                                          HttpServletRequest request) {
+
+        try{
+            Campaign createdCampaign = commonService.submitCampaign(campaign);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", createdCampaign.getId());
+            response.put("campaignName", createdCampaign.getCampaignName());
+
+            return ResponseEntity.ok(new RestResponse<>(response
+                    ,true,null
+                    ,null,null));
+        }catch (Exception e){
+            return ResponseEntity.status(500)
+                    .body(new RestResponse<>("Could not create campaign",
+                            false,
+                            e.getMessage(),
+                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            request.getRequestURI()));
+        }
     }
 
     @PostMapping("/submitCsv")

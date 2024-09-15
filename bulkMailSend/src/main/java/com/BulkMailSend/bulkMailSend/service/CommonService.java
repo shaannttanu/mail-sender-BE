@@ -1,5 +1,6 @@
 package com.BulkMailSend.bulkMailSend.service;
 
+import com.BulkMailSend.bulkMailSend.domain.Campaign;
 import com.BulkMailSend.bulkMailSend.domain.Organisation;
 import com.BulkMailSend.bulkMailSend.repository.OrganisationRepository;
 import org.apache.poi.ss.usermodel.Row;
@@ -20,7 +21,7 @@ import java.util.Map;
 
 public interface CommonService {
 
-    void submitCampaign(String campaignName);
+    Campaign submitCampaign(Campaign campaignName);
     Map<String, List<String>> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException;
 
 }
