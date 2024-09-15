@@ -52,9 +52,8 @@ public class CommonServiceImpl implements CommonService {
     public Map<String, List<String>> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException {
         Map<String, List<String>> organisationEmails = new HashMap<>();
 
-        final String REQUIRED_COLUMN_NAME = "organisationId";
-
-        try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
+        try (InputStream is = file.getInputStream();
+             Workbook workbook = WorkbookFactory.create(is)) {
             Sheet sheet = workbook.getSheetAt(0);
             if (sheet == null || sheet.getPhysicalNumberOfRows() < 2) {
                 throw new IllegalArgumentException("incorrect format of the file");
@@ -68,40 +67,40 @@ public class CommonServiceImpl implements CommonService {
             int organisationIdColumnIndex = -1;
             for (int i = 0; i < headerRow.getPhysicalNumberOfCells(); i++) {
                 Cell cell = headerRow.getCell(i);
-                if (cell != null && REQUIRED_COLUMN_NAME.equalsIgnoreCase(cell.getStringCellValue())) {
+                if (cell != null && "organisationId".equalsIgnoreCase(cell.getStringCellValue())) {
                     organisationIdColumnIndex = i;
                     break;
                 }
             }
 
             if (organisationIdColumnIndex == -1) {
-                throw new IllegalArgumentException("incorrect format of file ('organisationId' not present)");
+                throw new IllegalArgumentException("incorrect format of the file ('organisationId' column not present)");
             }
-
             for (int rowIndex = 1; rowIndex < sheet.getPhysicalNumberOfRows(); rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
                 if (row == null) {
                     continue;
                 }
-
                 Cell organisationIdCell = row.getCell(organisationIdColumnIndex);
-                if (organisationIdCell == null) {
+                if (organisationIdCell == null || organisationIdCell.getCellType() != CellType.STRING) {
                     continue;
                 }
 
                 String organisationId = organisationIdCell.getStringCellValue();
-                logger.info("Parsing for row: {}", rowIndex);
+                logger.info("Parsing row: {}", rowIndex);
 
                 Organisation organisation = organisationRepository.findByOrganisationId(organisationId);
                 if (organisation != null) {
-                    organisationEmails.computeIfAbsent(organisation.getOrganisationId(), k -> new ArrayList<>())
-                            .add(String.valueOf(organisation.getEmail()));
+                    List<String> emails = organisation.getEmail();
+                    organisationEmails.put(organisation.getOrganisationId(), emails);
                 }
             }
         }
 
         return organisationEmails;
     }
+
+
 
 
     @Override
