@@ -5,6 +5,8 @@ import com.BulkMailSend.bulkMailSend.domain.Organisation;
 import com.BulkMailSend.bulkMailSend.repository.CampaignRepository;
 import com.BulkMailSend.bulkMailSend.repository.OrganisationRepository;
 import com.BulkMailSend.bulkMailSend.service.CommonService;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -16,9 +18,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -79,6 +83,20 @@ public class CommonServiceImpl implements CommonService {
         }
 
         return organisationEmails;
+    }
+
+    public ByteArrayResource generateTemplate() throws IOException {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Template");
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("organisationId");
+            headerRow.createCell(1).setCellValue("organisationName");
+
+            workbook.write(outputStream);
+
+            return new ByteArrayResource(outputStream.toByteArray());
+        }
     }
 
 }
