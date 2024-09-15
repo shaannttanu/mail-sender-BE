@@ -34,13 +34,12 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public Campaign submitCampaign(Campaign campaign) {
-        // Create a new Campaign object
+
         Campaign newCampaign = new Campaign();
         newCampaign.setCampaignId(UUID.randomUUID().toString());
         newCampaign.setCampaignName(campaign.getCampaignName());
 
         try {
-            // Save the campaign and return the saved object
             return campaignRepository.save(newCampaign);
         } catch (Exception e) {
             logger.error("Error creating campaign: {}", e.getMessage());
@@ -105,7 +104,7 @@ public class CommonServiceImpl implements CommonService {
     }
 
 
-
+    @Override
     public ByteArrayResource generateTemplate() throws IOException {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Template");
