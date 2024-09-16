@@ -26,6 +26,5 @@ public interface CommonService {
     Campaign submitCampaign(Campaign campaignName);
     List<String> parseExcelAndFetchOrganisationEmails(MultipartFile file) throws IOException;
     ByteArrayResource generateTemplate() throws IOException;
-
-    void sendMail(MailDto mailDto);
+    void sendMail(MailDto mailDto) throws Exception;
 }

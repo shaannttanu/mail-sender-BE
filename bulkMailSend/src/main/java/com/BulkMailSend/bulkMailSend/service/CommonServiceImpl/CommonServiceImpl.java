@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -31,6 +33,9 @@ public class CommonServiceImpl implements CommonService {
 
     @Autowired
     OrganisationRepository organisationRepository;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
 
@@ -129,8 +134,22 @@ public class CommonServiceImpl implements CommonService {
 
 
     @Override
-    public void sendMail(MailDto mailDto) {
-        System.out.println("mail sent");
-        return;
+    public void sendMail(MailDto mailDto) throws Exception{
+
+        try{
+
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(mailDto.getMailIds().toArray(new String[0]));
+            mailMessage.setSentDate(new Date());
+            mailMessage.setSubject(mailDto.getSubject());
+            mailMessage.setText(mailDto.getBody());
+
+            javaMailSender.send(mailMessage);
+
+        }catch (Exception e){
+            logger.error("COULD NOT SEND MAIL due to ",e);
+            throw new Exception("Could not send mail due to : "+e.getMessage());
+        }
     }
+
 }
