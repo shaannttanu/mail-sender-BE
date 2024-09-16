@@ -13,10 +13,6 @@ import java.io.InputStream;
 import java.util.*;
 
 import java.util.stream.Collectors;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -25,9 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import javax.mail.internet.*;
 import java.util.List;
-import java.util.Properties;
 
 @Service
 public class CommonServiceImpl implements CommonService {
@@ -101,11 +95,13 @@ public class CommonServiceImpl implements CommonService {
 
                 String organisationId = organisationIdCell.getStringCellValue();
                 logger.info("Parsing for row: {}", rowIndex);
-
                 Organisation organisation = organisationRepository.findByOrganisationId(organisationId);
                 if (organisation != null) {
                     List<String> emailList=organisation.getEmail();
-                   organisationEmails.add(emailList);
+                    if(emailList==null){
+                        continue;
+                    }
+                    organisationEmails.add(emailList);
                 }
             }
         }
